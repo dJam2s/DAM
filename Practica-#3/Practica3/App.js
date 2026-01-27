@@ -1,10 +1,19 @@
-import { StyleSheet, Text, View, Image, ScrollView, Dimensions } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View, Image, ScrollView, Dimensions, SafeAreaView } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 export default function App() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleScroll = (event) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / width);
+    setCurrentIndex(index);
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.TitleContainer}>
         <Text>Los 3 albumes que más escucho</Text>
       </View>
@@ -13,6 +22,7 @@ export default function App() {
           showsHorizontalScrollIndicator={false}
           pagingEnabled={true}
           style={styles.AlbumScrollView}
+          onMomentumScrollEnd={handleScroll}
         >
           <View style={styles.ImageContainer}>
             <Image source={require('./assets/Album1.png')} style={styles.AlbumImage} />
@@ -34,8 +44,19 @@ export default function App() {
             </Text>
           </View>
         </ScrollView>
+        <View style={styles.PaginationContainer}>
+          {[0, 1, 2].map((i) => (
+            <View
+              key={i}
+              style={[
+                styles.PaginationDot,
+                { opacity: currentIndex === i ? 1 : 0.3 }
+              ]}
+            />
+          ))}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
 
   );
 }
@@ -83,4 +104,17 @@ const styles = StyleSheet.create({
     marginHorizontal: '5%',
     textAlign: 'center',
   },
+  PaginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  PaginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#333',
+    marginHorizontal: 4,
+  }
 });
